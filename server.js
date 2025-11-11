@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 const nodemailer = require('nodemailer');
 require('dotenv').config()
+const cors = require('cors')
+
+app.use(cors())
 
 const port = 4000
 
@@ -11,7 +14,11 @@ app.get('/', (req, res) => {
     res.send('Hello World!')
 })
 
-app.post('/email', (req, res) => {
+app.post('/email', async (req, res) => {
+
+  const {name, contactInfo, message} = req.body;
+
+  
 
 let transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -23,12 +30,12 @@ let transporter = nodemailer.createTransport({
 
 let mailOptions = {
   from: process.env.EMAIL,
-  to: 'yakovw2706@gmail.com',
-  subject: 'Sending Email using Node.js',
-  text: 'That was easy!'
+    to: 'yakovw2706@gmail.com',
+    subject: `Message from ${name}`,
+    text: `Contact info: ${contactInfo}\n\nMessage: ${message}`
 };
 
-transporter.sendMail(mailOptions, function(error, info){
+await transporter.sendMail( mailOptions, function(error, info){
   if (error) {
     console.log(error);
   } else {
